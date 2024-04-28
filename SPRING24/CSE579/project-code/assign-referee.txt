@@ -1,0 +1,57 @@
+% Search Space
+
+1 {assign(Cas_id,Reff_id) : referee(Reff_id,Reff_type, Wrkld_max, Wrkld_prv, Pymnt_Prev)} 1  :- case(Cas_id,Case_type, Eff, Dmg, Pstl_Cde, Pymnt).
+
+% constraints
+:- Wrkld_sum = #sum{Eff,Reff_id ,Cas_id : 
+                        assign(Cas_id,Reff_id),
+                case(Cas_id, Case_type, Eff, Dmg, Pstl_Cde, Pymnt)},
+                referee(Reff_id,Reff_type, Wrkld_max, 
+                        Wrkld_prv, Pymnt_Prev), 
+                Wrkld_sum > Wrkld_max.
+
+
+:- assign(Cas_id, Reff_id),
+referee(Reff_id, Reff_type, Wrkld_max, Wrkld_prv, Pymnt_Prev),
+case(Cas_id, Case_type, Eff, Dmg, Pstl_Cde, Pymnt), 
+prefRegion(Reff_id,Pstl_Cde,0).
+
+:- assign(Cas_id,Reff_id),
+referee(Reff_id,Reff_type, Wrkld_max, Wrkld_prv, Pymnt_Prev),
+case(Cas_id,Case_type, Eff, Dmg, Pstl_Cde, Pymnt), 
+prefType(Reff_id,Case_type,0).
+
+:- assign(Cas_id,Reff_id),
+referee(Reff_id,Reff_type, Wrkld_max, Wrkld_prv, Pymnt_Prev),
+case(Cas_id,Case_type, Eff, Dmg, Pstl_Cde, Pymnt), 
+Reff_type==e , 
+externalMaxDamage(Max_D), Dmg > Max_D.
+
+
+intnum(N) :- N=#count{ 1 , Reff_id : 
+assign(Cas_id,Reff_id),
+referee(Reff_id,Reff_type, Wrkld_max, 
+Wrkld_prv, Pymnt_Prev), 
+Reff_type==i }.
+#maximize{N: intnum(N)}.
+
+payment(Reff_id , Pay) :- Pay=  #sum{Pymnt, Reff_id, Cas_id:assign(Cas_id, Reff_id) , case(Cas_id, Case_type, Eff, Dmg, Pstl_Cde, Pymnt)}, referee(Reff_id, Reff_type, Wrkld_max, Wrkld_prv, Pymnt_Prev), Reff_type == e.
+total_payment(Reff_id ,Pay_Money) :- Pay_Money=Pymnt_Prev+Pay, referee(Reff_id, Reff_type, Wrkld_max, Wrkld_prv, Pymnt_Prev), payment(Reff_id , Pay), Reff_type == e.
+min_pay(Pymnt_Mny1) :- total_payment(Reff_id1,Pymnt_Mny1), 0==#count{1,Reff_id2 : Pymnt_Mny1>Pymnt_Mny2,total_payment(Reff_id2,Pymnt_Mny2) },total_payment(Reff_id1,Pymnt_Mny1).
+max_pay(Pymnt_Mny1) :- total_payment(Reff_id1,Pymnt_Mny1), 0==#count{1,Reff_id2 : Pymnt_Mny1<Pymnt_Mny2,total_payment(Reff_id2,Pymnt_Mny2) },total_payment(Reff_id1,Pymnt_Mny1).
+
+pay_diff(D) :- D = (MAX-MIN), max_pay(MAX), min_pay(MIN).
+
+#minimize{D,Cas_id,Reff_id:pay_diff(D), assign(Cas_id,Reff_id), referee(Reff_id,Reff_type, Wrkld_max, Wrkld_prv, Pymnt_Prev), case(Cas_id,Case_type, Eff, Dmg, Pstl_Cde, Pymnt) }.
+
+work(Reff_id,Case_Work) :-  Case_Work =  #sum{Eff , Reff_id , Cas_id :assign(Cas_id, Reff_id) , case(Cas_id, Case_type, Eff, Dmg, Pstl_Cde, Pymnt)}, referee(Reff_id, Reff_type, Wrkld_max, Wrkld_prv, Pymnt_Prev).
+total_workload(Reff_id, TWork) :- TWork = Wrkld_prv + Case_Work, referee(Reff_id, Reff_type, Wrkld_max, Wrkld_prv, Pymnt_Prev), work(Reff_id,Case_Work).
+min_work(T_wrk1) :- total_workload(Reff_id1, T_wrk1), 0==#count{1, Reff_id2 : T_wrk1>T_wrk2,total_workload(Reff_id2, T_wrk2) },total_workload(Reff_id1, T_wrk1).
+max_work(T_wrk1) :- total_workload(Reff_id1, T_wrk1), 0==#count{1, Reff_id2 : T_wrk1<T_wrk2,total_workload(Reff_id2, T_wrk2) },total_workload(Reff_id1, T_wrk1).
+work_diff(D) :- D = (MAX-MIN), max_work(MAX), min_work(MIN).
+
+#minimize{D,Cas_id ,Reff_id : work_diff(D), assign(Cas_id,Reff_id), referee(Reff_id,Reff_type, Wrkld_max, Wrkld_prv, Pymnt_Prev), case(Cas_id,Case_type, Eff, Dmg, Pstl_Cde, Pymnt) }.
+
+#maximize{Case_Pre+Region_Pre,Reff_id: assign(Cas_id,Reff_id),referee(Reff_id,Reff_type, Wrkld_max, Wrkld_prv, Pymnt_Prev),case(Cas_id,Case_type, Eff, Dmg, Pstl_Cde, Pymnt) , prefRegion(Reff_id,Pstl_Cde,Region_Pre),prefType(Reff_id,Case_type,Case_Pre)}.
+
+#show assign/2.

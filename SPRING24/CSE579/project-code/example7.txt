@@ -1,0 +1,6 @@
+case(11, a, 90, 10000, 3033, 65). case(12, b, 90, 5000, 3033, 65). case(13, a, 90, 5000, 3034, 65).
+referee(23, i, 480, 3000, 0). referee(24, i, 480, 3000, 0). referee(25, e, 360, 1000, 1000). referee(26, e, 120, 2500, 1700).
+prefType(23, a, 2). prefType(23, b, 2). prefType(24, a, 1). prefType(24, b, 3). prefType(25, a, 1). prefType(25, b, 3). prefType(26, a, 3). prefType(26, b, 0).
+prefRegion(23, 3033, 1). prefRegion(23, 3034, 3).
+prefRegion(24, 3033, 2). prefRegion(24, 3034, 1). prefRegion(25, 3033, 2). prefRegion(25, 3034, 1). prefRegion(26, 3033, 3). prefRegion(26, 3034, 1).
+externalMaxDamage(10000).

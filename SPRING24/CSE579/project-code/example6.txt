@@ -1,0 +1,6 @@
+case(8, a, 90, 5000, 3033, 65). case(9, a, 240, 5000, 3033, 160). case(10, a, 40, 5000, 3033, 25).
+referee(19, i, 360, 2000, 0).
+referee(20, i, 600, 6000, 0). referee(21, e, 480, 2000, 1200). referee(22, e, 480, 6000, 4000).
+prefType(19, a, 3). prefType(20, a, 1). prefType(21, a, 2). prefType(22, a, 3).
+prefRegion(19, 3033,3). prefRegion(20, 3033,1). prefRegion(21, 3033,3). prefRegion(22, 3033,3).
+externalMaxDamage(10000).
